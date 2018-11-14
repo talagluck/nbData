@@ -1,0 +1,138 @@
+RES
+main_report_csv = Top, Area, Structure, Utilities
+Owners_csv
+Sales_csv
+Improvements_csv
+Landtypes_csv
+Exemptions_csv
+Taxes_csv (from taxes tab)
+?Special districts?
+
+COM
+main_report_csv = Top,Utilities,Inventory
+Owners_csv
+Sales_csv
+Improvements_csv
+Landtypes_csv
+Exemptions_csv
+Taxes_CSV
+?Special districts?
+Buildings_csv
+Site uses
+
+
+if residential or if commercial follow the steps for that
+figure out which csvs will be output and use municipality to title them ('tuxedo_owners', 'tuxedo_sales',etc.)
+then do the scraping for each one
+
+
+Finish up the commercial scraping
+Take care of taxes for both. For taxes, see if theres a nice way to translate the historical data table to pandas
+Store everything a SQLite db
+
+if data doesn't work pull into its own file
+
+Get all of the property links
+Grab all of the data for each listing
+Append or store that data somewhere
+
+Scrape commercial and residential
+
+
+
+
+
+
+Both
+RC Owners
+RC Sales
+RC Utilities
+RC Improvements
+RC Land Types
+RC Special Districts
+RC Exemptions
+
+Residential
+R Area
+R Structure
+
+Commercial
+C Inventory
+C Buildings
+C Site Uses
+
+
+Swis: PI+R
+Tax-ID: PI+R
+Status: PI+R
+*Address: PI+R - maybe easier in PI
+Property Class: PI+R
+Site: PI+R
+Zoning Code: PI+R
+Neighborhood: PI+R
+Property Description: PI+R
+Total Acreage/Size: PI+R
+Land Assessment: PI+R
+Full Market Value: PI+R
+Deed Book: PI+R
+Deed Page: PI+R
+Grid East: PI+R
+Grid North: PI+R
+
+*Land Types: PI+R - not sure which is easier
+  Primary
+
+*Ownership: OS+R - maybe easier in OS
+  Name
+  Address
+
+*Sale Information: OS+R - not sure which is easier
+  Sale Date
+  Price
+  Property Class
+  Prior Owner
+
+Inventory: I+R
+-Building Style
+-# Baths
+-# Bedrooms
+-# Kitchens
+-# Fireplaces
+-Overall Conditions
+-Overall Grade
+-Year Built
+-Basement Type
+
+Area: I+R
+-Living Area
+-First Story Area
+-Second Story Area
+-Additional Story Area
+-# Stories
+
+Utilities:I+R
+-Sewer Type
+-Water Supply
+-Utilities
+-Heat Type
+-Fuel Type
+-Central Air
+
+Improvements: Imp+R
+
+*Tax Summary: TI+R (might be missing from TI)
+-School
+-County
+
+NOT IN REPORT but in TI***Taxable Values
+-County Taxable
+-Muni Taxable
+-School Taxable
+
+NOT IN REPORT but in TI***Details for Taxes Levied (in current year)
+-County
+-City
+-Upd Sanitation
+-Upd utilities
+
+NOT IN REPORT but in TI***Historical Tax Summary (8 prior years)
