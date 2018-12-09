@@ -6,9 +6,9 @@ import pandas as pd
 import os
 import json
 import pickle
-from Classes.Residential import Residential
-from Classes.Commercial import Commercial
-from Classes.Building import Building
+# from Classes.Residential import Residential
+# from Classes.Commercial import Commercial
+# from Classes.Building import Building
 from Classes.Taxes import Taxes
 import datetime
 import csv
@@ -141,14 +141,13 @@ def iterate_link_table(pd_link_table,start,finish,driver):
 
 
 municipality = "newburgh"
-csv_filename = "main/"+municipality + "_links.csv"
+csv_filename = "./main/"+municipality + "_links.csv"
 # url = "http://propertydata.orangecountygov.com/propdetail.aspx?swis=331100&printkey=00100000020010000000"
-
 
 link_table = load_link_csv(csv_filename)
 driver = setup_driver()
 through_public_access(link_table.iloc[0].link)
-iterate_link_table(link_table,0,1,driver)
-# driver.quit()
+iterate_link_table(link_table,len(link_table),len(link_table)+1,driver)
+driver.quit()
 print('Done')
 # messagebox.showinfo("Done", "Done!")

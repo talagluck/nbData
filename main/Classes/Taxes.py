@@ -7,6 +7,10 @@ import os
 import datetime
 import csv
 
+
+#start from scratch with the csv export. double check data structures and output that way.
+#if worse comes to worse, append all of the dataframes to a larger dataframe and output that
+#though that may cause issues if it errors before the dataframe has exported
 class Taxes(object):
     def __init__(self, driver, swis, tax_ID,municipality,property_type,url):
         self.driver = driver
@@ -33,13 +37,16 @@ class Taxes(object):
         self.historical_tax = None
         self.detailed_tax = None
         self.detailed_dataframe_list = []
-        self.detailed_error_dataframe = pd.DataFrame(columns = self.basic_headers.append('year') )
-        self.all_errors = pd.DataFrame(columns = self.basic_headers.append('error_type'))
+        self.detailed_error_header = self.basic_headers.append(['year','url'])
+        self.detailed_error_dataframe = pd.DataFrame(columns = self.detailed_error_header)
+        self.all_error_header = self.basic_headers.append(['error_type','url'])
+        self.all_errors = pd.DataFrame(columns = self.all_error_header)
+        self.detailed_errors_csv =  f'{self.folder_name}/{self.municipality}_detailed_errors.csv'
+        self.all_errors_csv =  f'{self.folder_name}/{self.municipality}_all_errors.csv'
         self.exemptions_csv = f'{self.folder_name}/{self.municipality}_tax_exemptions.csv'
         self.values_csv = f'{self.folder_name}/{self.municipality}_tax_values.csv'
         self.historical_csv = f'{self.folder_name}/{self.municipality}_tax_historical.csv'
         self.detailed_csv = f'{self.folder_name}/{self.municipality}_tax_detailed.csv'
-
         try:
             self.exemptions = self.scr_exemptions()
             # print(self.exemptions)
@@ -68,19 +75,21 @@ class Taxes(object):
             self.basic_error_notate('detailed')
 
         self.check_all_for_errors()
-        print(self.all_errors)
+        # print(self.all_errors)
 
         self.csv_header = {self.exemptions_csv:self.exemptions_header,self.values_csv:self.taxable_values_header,
-                            self.historical_csv:self.summary_header,self.detailed_csv:self.detailed_header}
+                            self.historical_csv:self.summary_header,self.detailed_csv:self.detailed_header,
+                            self.detailed_errors_csv:self.detailed_error_header,self.all_errors_csv:self.all_error_header}
         self.csv_dataframe = {self.exemptions_csv:self.exemptions,self.values_csv:self.taxable_values,
-                            self.historical_csv:self.historical_tax,self.detailed_csv:self.detailed_tax,'error':self.all_errors}
+                            self.historical_csv:self.historical_tax,self.detailed_csv:self.detailed_tax,
+                            self.detailed_errors_csv:self.detailed_error_dataframe,self.all_errors_csv:self.all_errors}
 
     def basic_error_notate(self,error_type):
         df = pd.DataFrame(columns=['error_type'])
-        df = df.append([{'error_type':error_type}])
+        df = df.append([{'error_type':error_type,'url':self.original_url}])
         self.add_id_columns(df)
         self.all_errors = self.all_errors.append(df)
-        print(error_type,"error")
+        # print(error_type,"error")
 
     def add_error_df(self,class_attr_to_check,error_type):
         if class_attr_to_check is None:
@@ -221,6 +230,7 @@ class Taxes(object):
             except:
                 df = pd.DataFrame(columns=['year'])
                 df['year'] = year
+                df['url'] = self.original_url
                 self.add_id_columns(df)
                 self.detailed_error_dataframe.append(df)
         return pd.concat(self.detailed_dataframe_list,sort=False)
@@ -228,28 +238,23 @@ class Taxes(object):
     def create_csv(self,data,csv_filename,headers):
         # data.to_csv(csv_filename,index_label=False,header = self.main_headers)
         with open(csv_filename,'w') as file:
-            writer = csv.DictWriter(file, fieldnames = headers)
-            writer.writeheader()
-            print('header is', headers,'\n')
-            print('csv headers',data.columns)
-            writer.writerows(data)
+            data.to_csv(file,index=False)
     def append_csv(self,data,csv_filename,headers):
         # data.to_csv(csv_filename,mode='a',header=False,index_label=False)
         with open(csv_filename,'a') as file:
-            writer=csv.DictWriter(file,fieldnames = headers)
-            writer.writerows(data)
+            data.to_csv(file,index=False,header=False)
 
-    def append_multiple_rows_csv(self, data,csv_filename,headers):
-        for row in data:
-            self.append_csv(row,csv_filename,headers)
-    def create_multiple_rows_csv(self, data,csv_filename,headers):
-        print('create multiple rows',data)
-        for idx,row in data.iterrows():
-            print(row)
-            if idx == 0:
-                self.create_csv(row,csv_filename,headers)
-            else:
-                self.append_csv(row,csv_filename,headers)
+    # def append_multiple_rows_csv(self, data,csv_filename,headers):
+    #     for row in data:
+    #         self.append_csv(row,csv_filename,headers)
+    # def create_multiple_rows_csv(self, data,csv_filename,headers):
+    #     print('create multiple rows',data)
+    #     for idx,row in data.iterrows():
+    #         print(row)
+    #         if idx == 0:
+    #             self.create_csv(row,csv_filename,headers)
+    #         else:
+    #             self.append_csv(row,csv_filename,headers)
 
 
     def all_csvs(self):
@@ -260,21 +265,34 @@ class Taxes(object):
             os.mkdir(self.folder_name)
             print('made directory')
 
+        csv_name = self.values_csv
+        dataframe = self.taxable_values
+
+        # self.create_csv(dataframe,csv_name,self.taxable_values_header)
         for csv_name, dataframe in self.csv_dataframe.items():
             if csv_name in self.csv_header.keys():
-                print(csv_name,dataframe)
+                # print(csv_name,dataframe)
                 if dataframe is not None:
-                    print('not none',csv_name)
-                    if os.path.exists(csv_name):
-                        # print('exists appending',csv_name)
-                        # self.append_multiple_rows_csv(dataframe,csv_name,self.csv_header[csv_name])
-                        # print('header',self.csv_header[csv_name])
-                        self.append_csv(dataframe,csv_name, self.csv_header[csv_name])
-                    else:
-                        # print('creating',csv_name)
-                        # print(dataframe)
-                        # self.create_multiple_rows_csv(dataframe,csv_name,self.csv_header[csv_name])
-                        self.create_csv(dataframe,csv_name,self.csv_header[csv_name])
+                    if not dataframe.empty:
+                        # print('not none',csv_name)
+                        if os.path.exists(csv_name):
+                            # print('exists appending',csv_name)
+                            # self.append_multiple_rows_csv(dataframe,csv_name,self.csv_header[csv_name])
+                            # print('header',self.csv_header[csv_name])
+                            self.append_csv(dataframe,csv_name, self.csv_header[csv_name])
+                        else:
+                            # print('creating',csv_name)
+                            # print(dataframe)
+                            # self.create_multiple_rows_csv(dataframe,csv_name,self.csv_header[csv_name])
+                            self.create_csv(dataframe,csv_name,self.csv_header[csv_name])
+
+
+
+
+
+
+
+
 
 
     # if os.path.exists(self.main_csv):
