@@ -7,7 +7,7 @@ import csv
 
 from Classes.Grab_Links import Grab_Links
 
-url = "http://propertydata.orangecountygov.com/viewlist.aspx?sort=printkey&swis=3350&page=1"
+url = "http://propertydata.orangecountygov.com/viewlist.aspx?sort=printkey&swis=331100&advanced=true&page=1"
 options = webdriver.ChromeOptions()
 # options.add_argument('headless')
 
@@ -33,7 +33,7 @@ def get_all_links(url, driver, csv_filename):
         link_grabber.next_page()
     link_grabber.remove_dupes()
 
-get_all_links(url, driver, "tuxedo_links2.csv")
+get_all_links(url, driver, "newburgh2.csv")
 
 driver.quit()
 # print (json.dumps(entry.main_dict, indent=1))

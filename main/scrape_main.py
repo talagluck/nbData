@@ -32,7 +32,7 @@ def load_link_csv(csv_filename):
 
 def setup_driver():
     options = webdriver.ChromeOptions()
-    options.add_argument('headless')
+    # options.add_argument('headless')
     driver = webdriver.Chrome(chrome_options=options)
     return driver
 
@@ -79,6 +79,11 @@ def res_or_com(driver):
     if try_button(btnRes):
         return "Residential"
 
+    btnOther = driver.find_elements_by_id('btnNoSitesReport')
+
+    if try_button(btnOther):
+        return "Other"
+
     return False
 
 def property_track(good_or_bad,municipality,swis,tax_ID):
@@ -111,7 +116,7 @@ def iterate_link_table(pd_link_table,start,finish,driver):
 
         swis = row.swis_x
         tax_ID = row.tax_ID
-
+        prop_type = 'unknown'
         prop_type = res_or_com(driver)
 
         if prop_type:
@@ -129,7 +134,7 @@ def iterate_link_table(pd_link_table,start,finish,driver):
 
 municipality = "newburgh"
 # csv_filename = municipality + "_links.csv"
-csv_filename = "error_links.csv"
+csv_filename = "./jupyter/error_links_dup.csv"
 # url = "http://propertydata.orangecountygov.com/propdetail.aspx?swis=331100&printkey=00100000020010000000"
 
 

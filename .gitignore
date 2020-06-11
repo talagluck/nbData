@@ -2,11 +2,9 @@ __pycache__
 .ipynb_checkpoints
 jupyter
 nbdEnv
-newburgh_scraped
-newburgh_scraped backup
-newburgh_taxes_scraped
+data
 old
-sample pages
 test
 .DS_Store
 .env
+venv
